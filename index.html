@@ -570,6 +570,76 @@ footer { text-align:center; padding:28px 20px; border-top:1px solid rgba(139,0,2
   #countdown-bar{padding:8px 14px;}
   .cd-num{font-size:15px;}
 }
+
+/* ── NOTIFICATION TICKERS ── */
+.notif-ticker {
+  width:100%; overflow:hidden;
+  display:flex; align-items:center;
+  gap:0; z-index:190;
+  border:none; padding:0;
+}
+/* TOP ticker */
+.notif-ticker.top {
+  position:sticky; top:57px;
+  background:linear-gradient(90deg,rgba(8,0,15,0.97),rgba(20,0,40,0.97));
+  border-bottom:1px solid rgba(240,180,41,0.35);
+  border-top:1px solid rgba(240,180,41,0.15);
+  backdrop-filter:blur(10px);
+}
+/* BOTTOM ticker */
+.notif-ticker.bottom {
+  position:fixed; bottom:0; left:0; right:0;
+  background:linear-gradient(90deg,rgba(8,0,15,0.97),rgba(20,0,40,0.97));
+  border-top:1px solid rgba(139,0,255,0.4);
+  z-index:999;
+}
+.notif-label {
+  flex-shrink:0;
+  font-family:var(--font-mono);
+  font-size:10px; letter-spacing:2px;
+  padding:7px 14px;
+  white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+}
+.notif-ticker.top    .notif-label { background:rgba(240,180,41,0.14); color:var(--gold-bright); border-right:1px solid rgba(240,180,41,0.3); }
+.notif-ticker.bottom .notif-label { background:rgba(139,0,255,0.14);  color:var(--purple-light); border-right:1px solid rgba(139,0,255,0.3); }
+.notif-dot {
+  width:6px; height:6px; border-radius:50%;
+  animation:dotPulse 1.2s ease-in-out infinite;
+}
+.notif-ticker.top    .notif-dot { background:var(--gold-bright); box-shadow:0 0 6px rgba(240,180,41,0.8); }
+.notif-ticker.bottom .notif-dot { background:var(--purple-light); box-shadow:0 0 6px rgba(168,85,247,0.8); }
+@keyframes dotPulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(0.7);} }
+
+.notif-track-wrap { flex:1; overflow:hidden; position:relative; height:32px; }
+.notif-track {
+  display:flex; align-items:center;
+  white-space:nowrap; height:100%;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:1.5px;
+  animation:tickerScroll 28s linear infinite;
+}
+.notif-ticker.bottom .notif-track { animation:tickerScrollRev 32s linear infinite; }
+@keyframes tickerScroll    { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+@keyframes tickerScrollRev { 0%{transform:translateX(-50%);} 100%{transform:translateX(0);} }
+.notif-track:hover { animation-play-state:paused; }
+
+.notif-item {
+  display:inline-flex; align-items:center; gap:10px;
+  padding:0 32px;
+}
+.notif-ticker.top    .notif-item { color:var(--gold-glow); }
+.notif-ticker.bottom .notif-item { color:var(--purple-light); }
+.notif-item .ni-badge {
+  font-size:9px; letter-spacing:2px;
+  padding:2px 8px; border-radius:2px;
+  font-weight:700;
+}
+.notif-ticker.top    .ni-badge { background:rgba(240,180,41,0.2); color:var(--gold-bright); border:1px solid rgba(240,180,41,0.4); }
+.notif-ticker.bottom .ni-badge { background:rgba(139,0,255,0.2);  color:var(--purple-light); border:1px solid rgba(139,0,255,0.4); }
+.notif-sep { color:rgba(255,255,255,0.15); font-size:14px; padding:0 8px; }
+
+/* extra bottom padding so fixed bottom ticker doesn't overlap content */
+body { padding-bottom:34px; }
 </style>
 </head>
 <body>
@@ -600,6 +670,24 @@ footer { text-align:center; padding:28px 20px; border-top:1px solid rgba(139,0,2
       <div class="cd-unit"><div class="cd-num" id="cd-mm">00</div><div class="cd-seg">MIN</div></div>
       <div class="cd-colon">:</div>
       <div class="cd-unit"><div class="cd-num" id="cd-ss">00</div><div class="cd-seg">SEC</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOP NOTIFICATION TICKER ══ -->
+<div class="notif-ticker top">
+  <div class="notif-label"><div class="notif-dot"></div>🔔 NOTICE</div>
+  <div class="notif-track-wrap">
+    <div class="notif-track">
+      <!-- duplicate items for seamless loop -->
+      <span class="notif-item"><span class="ni-badge">NEW</span>DMGT &amp; JAVA notes are available for supplementary exams — check Study Resources now!</span>
+      <span class="notif-sep">✦</span>
+      <span class="notif-item"><span class="ni-badge">INFO</span>All supplementary exam study materials have been uploaded to the Google Drive folder.</span>
+      <span class="notif-sep">✦</span>
+      <span class="notif-item"><span class="ni-badge">NEW</span>DMGT &amp; JAVA notes are available for supplementary exams — check Study Resources now!</span>
+      <span class="notif-sep">✦</span>
+      <span class="notif-item"><span class="ni-badge">INFO</span>All supplementary exam study materials have been uploaded to the Google Drive folder.</span>
+      <span class="notif-sep">✦</span>
     </div>
   </div>
 </div>
@@ -691,6 +779,23 @@ footer { text-align:center; padding:28px 20px; border-top:1px solid rgba(139,0,2
   <div class="footer-txt">SMART EXAM PLANNER · DEVELOPED BY <span>CHANDRA MOHAN</span> · ALIET 2026 · CSE DS AR24</div>
   <div class="footer-txt" style="margin-top:6px;color:var(--purple-glow)">MISSION PLACEMENTS · EXECUTE WITH PRECISION</div>
 </footer>
+
+<!-- ══ BOTTOM NOTIFICATION TICKER ══ -->
+<div class="notif-ticker bottom">
+  <div class="notif-label"><div class="notif-dot"></div>📢 UPDATE</div>
+  <div class="notif-track-wrap">
+    <div class="notif-track">
+      <span class="notif-item"><span class="ni-badge">HOT</span>DMGT &amp; JAVA notes are available for supplementary exams — access via Study Resources!</span>
+      <span class="notif-sep">◆</span>
+      <span class="notif-item"><span class="ni-badge">ALERT</span>Supplementary exam notes uploaded — DMGT &amp; JAVA now available. Don't miss out!</span>
+      <span class="notif-sep">◆</span>
+      <span class="notif-item"><span class="ni-badge">HOT</span>DMGT &amp; JAVA notes are available for supplementary exams — access via Study Resources!</span>
+      <span class="notif-sep">◆</span>
+      <span class="notif-item"><span class="ni-badge">ALERT</span>Supplementary exam notes uploaded — DMGT &amp; JAVA now available. Don't miss out!</span>
+      <span class="notif-sep">◆</span>
+    </div>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════════════════
