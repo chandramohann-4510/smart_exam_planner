@@ -1,4 +1,4 @@
-# 📚 Smart Exam Planner — ALIET 2026
+# 📚 Smart Exam Planner — 
 
 > **Developed by Chandra Mohan · CSE DS AR24 · AR24 Regulation**  
 > *Mission: Placements · Execute with Precision*
