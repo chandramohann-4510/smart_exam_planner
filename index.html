@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Exam Planner — ALIET 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:       #08000f;
+  --bg-dark:       #110020;
+  --bg-card:       #160028;
+  --bg-card2:      #1c003a;
+  --purple-bright: #8b00ff;
+  --purple-glow:   #a855f7;
+  --purple-light:  #c084fc;
+  --purple-border: rgba(139,0,255,0.35);
+  --gold-bright:   #f0b429;
+  --gold-light:    #ffd166;
+  --gold-glow:     #ffe08a;
+  --gold-border:   rgba(240,180,41,0.35);
+  --gold-dark:     #b8860b;
+  --cyan:          #22d3ee;
+  --green:         #4ade80;
+  --red:           #f87171;
+  --text-1:        #f5eeff;
+  --text-2:        #c4b5d4;
+  --text-3:        #7c6b8f;
+  --font-main:     'Space Grotesk', sans-serif;
+  --font-display:  'Exo 2', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-1);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BG ── */
+.bg-layer {
+  position: fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(139,0,255,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 85%, rgba(240,180,41,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(30,0,60,0.4) 0%, transparent 70%);
+}
+.grid-bg {
+  position: fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(139,0,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,0,255,0.055) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.particle {
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  0%   { transform:translateY(100vh) translateX(0); opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:1; }
+  100% { transform:translateY(-80px) translateX(var(--drift)); opacity:0; }
+}
+
+/* ── COUNTDOWN BAR ── */
+#countdown-bar {
+  position: sticky; top:0; z-index:200;
+  background: linear-gradient(90deg, rgba(8,0,15,0.97) 0%, rgba(25,0,50,0.97) 50%, rgba(8,0,15,0.97) 100%);
+  border-bottom: 1px solid var(--purple-border);
+  backdrop-filter: blur(12px);
+  padding: 10px 24px;
+  display: flex; align-items:center; justify-content:space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.cd-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cd-exam-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.cd-timer {
+  display: flex; gap: 6px; align-items:center;
+}
+.cd-unit {
+  display: flex; flex-direction:column; align-items:center;
+  background: rgba(139,0,255,0.12);
+  border: 1px solid var(--purple-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  min-width: 48px;
+}
+.cd-num {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--purple-light);
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(168,85,247,0.7);
+}
+.cd-seg {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.cd-colon {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--purple-border);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.cd-all-done {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(74,222,128,0.5);
+}
+.cd-left { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.cd-right { display:flex; align-items:center; gap:8px; }
+.cd-phase-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.cd-phase-badge.mid    { background:rgba(240,180,41,0.12); color:var(--gold-bright); border:1px solid var(--gold-border); }
+.cd-phase-badge.lab    { background:rgba(34,211,238,0.1);  color:var(--cyan);        border:1px solid rgba(34,211,238,0.3); }
+.cd-phase-badge.semester { background:rgba(139,0,255,0.12); color:var(--purple-light); border:1px solid var(--purple-border); }
+
+/* ── WRAPPER ── */
+.wrapper { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 20px 80px; }
+
+/* ── HEADER ── */
+header { text-align:center; padding:44px 20px 28px; }
+.header-chip {
+  display:inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gold-bright);
+  letter-spacing: 4px;
+  border: 1px solid var(--gold-border);
+  padding: 5px 20px;
+  border-radius: 2px;
+  margin-bottom: 18px;
+  background: rgba(240,180,41,0.06);
+  animation: chipPulse 3s ease-in-out infinite;
+}
+@keyframes chipPulse {
+  0%,100%{box-shadow:0 0 8px rgba(240,180,41,0.25);}
+  50%{box-shadow:0 0 22px rgba(240,180,41,0.55);}
+}
+.main-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px,5.5vw,62px);
+  font-weight: 900;
+  line-height: 1.05;
+  background: linear-gradient(135deg, var(--gold-glow) 0%, var(--gold-bright) 35%, var(--purple-light) 75%, var(--purple-glow) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter: drop-shadow(0 0 28px rgba(240,180,41,0.35));
+  margin-bottom: 10px;
+  animation: titleGlow 4s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%,100%{filter:drop-shadow(0 0 18px rgba(240,180,41,0.3));}
+  50%{filter:drop-shadow(0 0 48px rgba(240,180,41,0.65));}
+}
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.mission-tag {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family: var(--font-display);
+  font-size: 12px; font-weight:600;
+  color: var(--purple-light);
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+.mission-tag::before, .mission-tag::after {
+  content:'◆'; color:var(--gold-bright); font-size:8px;
+  animation: spinDia 4s linear infinite;
+}
+@keyframes spinDia { to{transform:rotate(360deg);} }
+
+/* ── STATS ── */
+.stats-strip {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:12px; margin:28px 0;
+}
+.stat-card {
+  background: linear-gradient(135deg, rgba(28,0,58,0.7), rgba(17,0,32,0.8));
+  border: 1px solid var(--purple-border);
+  border-radius: 10px; padding:16px 12px; text-align:center;
+  transition: all 0.3s; cursor:default; position:relative; overflow:hidden;
+}
+.stat-card::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(240,180,41,0.06),transparent);
+  opacity:0; transition:opacity 0.3s;
+}
+.stat-card:hover::after{opacity:1;}
+.stat-card:hover{transform:translateY(-3px); border-color:var(--gold-border); box-shadow:0 8px 28px rgba(240,180,41,0.12);}
+.stat-num {
+  font-family:var(--font-display); font-size:30px; font-weight:900;
+  color:var(--gold-bright); text-shadow:0 0 18px rgba(240,180,41,0.55); line-height:1;
+}
+.stat-lbl {
+  font-family:var(--font-mono); font-size:10px; color:var(--text-3);
+  letter-spacing:2px; text-transform:uppercase; margin-top:5px;
+}
+
+/* ── ACTION BUTTONS ── */
+.action-bar { display:flex; justify-content:center; gap:14px; margin:6px 0 26px; flex-wrap:wrap; }
+.btn {
+  font-family:var(--font-display); font-size:12px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  padding:10px 26px; border-radius:5px; cursor:pointer;
+  border:none; position:relative; overflow:hidden; transition:all 0.3s;
+}
+.btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent 25%,rgba(255,255,255,0.18) 50%,transparent 75%);
+  transform:translateX(-100%); transition:transform 0.5s;
+}
+.btn:hover::before{transform:translateX(100%);}
+.btn-gold {
+  background:linear-gradient(135deg,#7a4500,var(--gold-dark));
+  color:var(--bg-deep); border:1px solid var(--gold-bright);
+  box-shadow:0 0 14px rgba(240,180,41,0.35);
+}
+.btn-gold:hover{box-shadow:0 0 30px rgba(240,180,41,0.65); transform:translateY(-2px);}
+.btn-purple {
+  background:linear-gradient(135deg,rgba(61,0,112,0.9),rgba(90,0,160,0.9));
+  color:#fff; border:1px solid var(--purple-glow);
+  box-shadow:0 0 14px rgba(139,0,255,0.35);
+}
+.btn-purple:hover{box-shadow:0 0 30px rgba(139,0,255,0.65); transform:translateY(-2px);}
+
+/* ── PROGRESS ── */
+.progress-section {
+  background:linear-gradient(135deg,rgba(28,0,58,0.5),rgba(17,0,32,0.7));
+  border:1px solid var(--purple-border); border-radius:12px;
+  padding:22px 24px; margin-bottom:32px; position:relative;
+}
+.progress-section::before {
+  content:'PROGRESS MATRIX';
+  position:absolute; top:-1px; right:20px;
+  font-family:var(--font-mono); font-size:9px; color:var(--purple-glow);
+  letter-spacing:3px; background:var(--bg-deep); padding:0 8px;
+}
+.prog-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+.prog-title { font-family:var(--font-display); font-size:14px; font-weight:700; color:var(--gold-bright); letter-spacing:2px; }
+.prog-pct { font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--purple-light); text-shadow:0 0 18px rgba(168,85,247,0.6); }
+.prog-bar-bg { background:rgba(255,255,255,0.06); border-radius:4px; height:10px; overflow:hidden; }
+.prog-bar-fill {
+  height:100%; border-radius:4px;
+  background:linear-gradient(90deg,var(--purple-bright),var(--gold-bright));
+  box-shadow:0 0 14px rgba(139,0,255,0.45);
+  transition:width 1s cubic-bezier(.4,0,.2,1); position:relative;
+}
+.prog-bar-fill::after {
+  content:''; position:absolute; right:0; top:0; bottom:0; width:28px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4));
+  animation:shimBar 2s ease-in-out infinite;
+}
+@keyframes shimBar{0%,100%{opacity:0}50%{opacity:1}}
+.subj-prog-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; margin-top:14px; }
+.subj-prog-item { display:flex; align-items:center; gap:10px; }
+.subj-prog-name { font-family:var(--font-mono); font-size:10px; color:var(--text-2); min-width:105px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mini-bar-bg { flex:1; background:rgba(255,255,255,0.07); border-radius:3px; height:6px; overflow:hidden; }
+.mini-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--purple-bright),var(--gold-dark)); transition:width 0.8s ease; }
+.mini-pct { font-family:var(--font-mono); font-size:10px; color:var(--gold-bright); min-width:32px; text-align:right; }
+
+/* ── PHASE HEADER ── */
+.phase-header { display:flex; align-items:center; gap:14px; margin:40px 0 16px; }
+.ph-line { flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--purple-border),transparent); }
+.ph-label {
+  font-family:var(--font-display); font-size:12px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase;
+  padding:7px 18px; border-radius:3px; white-space:nowrap;
+}
+.ph-label.mid { color:var(--gold-bright); border:1px solid var(--gold-border); background:rgba(240,180,41,0.08); }
+.ph-label.lab { color:var(--cyan); border:1px solid rgba(34,211,238,0.3); background:rgba(34,211,238,0.06); }
+.ph-label.semester { color:var(--purple-light); border:1px solid var(--purple-border); background:rgba(139,0,255,0.1); }
+
+/* ── EXAMS GRID ── */
+.exams-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px; }
+
+/* ── EXAM CARD ── */
+.exam-card {
+  background:linear-gradient(150deg,rgba(22,0,40,0.9),rgba(8,0,15,0.95));
+  border:1px solid var(--purple-border); border-radius:12px;
+  overflow:hidden; position:relative; transition:all 0.4s;
+}
+.exam-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--purple-bright),var(--gold-bright),transparent);
+  opacity:0.55;
+}
+.exam-card:hover:not(.is-past) {
+  transform:translateY(-5px);
+  border-color:rgba(168,85,247,0.55);
+  box-shadow:0 14px 48px rgba(139,0,255,0.22),0 0 28px rgba(240,180,41,0.08);
+}
+/* PAST / DONE */
+.exam-card.is-past {
+  opacity:0.55;
+  border-color:rgba(139,0,255,0.15);
+  filter:saturate(0.4);
+}
+.exam-card.is-past::before { background:linear-gradient(90deg,transparent,rgba(100,100,100,0.3),transparent); }
+.done-stamp {
+  position:absolute; top:12px; right:12px;
+  font-family:var(--font-mono); font-size:8px; letter-spacing:3px;
+  color:var(--text-3); border:1px solid rgba(255,255,255,0.12);
+  padding:2px 8px; border-radius:2px; background:rgba(0,0,0,0.4);
+  transform:rotate(3deg); display:none;
+}
+.exam-card.is-past .done-stamp { display:block; }
+
+/* Lab card accent */
+.exam-card.lab-card { border-color:rgba(34,211,238,0.2); }
+.exam-card.lab-card::before { background:linear-gradient(90deg,transparent,var(--cyan),transparent); }
+
+/* Card top bar */
+.card-top { display:flex; justify-content:space-between; align-items:flex-start; padding:14px 16px 10px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.card-subject { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--gold-bright); letter-spacing:0.5px; line-height:1.2; }
+.lab-card .card-subject { color:var(--cyan); }
+.is-next .card-subject { color:var(--gold-glow); text-shadow:0 0 12px rgba(255,224,138,0.5); }
+.card-date-block { text-align:right; flex-shrink:0; }
+.card-date { font-family:var(--font-mono); font-size:11px; color:var(--text-2); }
+.card-day  { font-family:var(--font-mono); font-size:9px; color:var(--purple-light); letter-spacing:2px; margin-top:2px; }
+.card-time { font-family:var(--font-mono); font-size:9px; color:var(--text-3); margin-top:2px; }
+
+/* NEXT badge */
+.next-badge {
+  display:none; position:absolute; top:0; left:16px;
+  font-family:var(--font-mono); font-size:8px; letter-spacing:2px;
+  background:linear-gradient(90deg,var(--purple-bright),var(--gold-dark));
+  color:#fff; padding:2px 10px; border-radius:0 0 6px 6px;
+}
+.is-next .next-badge { display:block; }
+
+/* Countdown strip on card */
+.card-cd {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 16px; background:rgba(0,0,0,0.25);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.card-cd-icon { font-size:13px; }
+.card-cd-text { font-family:var(--font-mono); font-size:11px; font-weight:600; }
+.card-cd-text.urgent { color:var(--red); text-shadow:0 0 10px rgba(248,113,113,0.55); animation:urgPulse 1s ease-in-out infinite; }
+.card-cd-text.soon   { color:var(--gold-bright); text-shadow:0 0 10px rgba(240,180,41,0.45); }
+.card-cd-text.normal { color:var(--purple-light); }
+.card-cd-text.past   { color:var(--text-3); }
+@keyframes urgPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* Syllabus section */
+.syll-section { padding:12px 16px 6px; }
+.syll-toggle {
+  display:flex; justify-content:space-between; align-items:center;
+  cursor:pointer; padding:4px 0; user-select:none;
+}
+.syll-toggle-lbl { font-family:var(--font-mono); font-size:10px; color:var(--text-3); letter-spacing:2px; text-transform:uppercase; }
+.syll-pct { font-family:var(--font-mono); font-size:10px; color:var(--gold-bright); }
+
+.units-list { margin-top:10px; display:none; }
+.units-list.open { display:block; }
+
+/* DE Lab has sub-groups */
+.lab-group-label {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--cyan); padding:6px 0 4px;
+  border-bottom:1px solid rgba(34,211,238,0.15); margin-bottom:4px;
+}
+
+.unit-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:7px 4px; border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer; border-radius:4px; transition:background 0.2s;
+}
+.unit-item:last-child { border-bottom:none; }
+.unit-item:hover { background:rgba(139,0,255,0.08); }
+
+.unit-cb {
+  width:17px; height:17px; border:1.5px solid var(--purple-border);
+  border-radius:3px; flex-shrink:0; margin-top:2px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.3s; position:relative; overflow:hidden;
+}
+.unit-cb.checked {
+  background:linear-gradient(135deg,var(--purple-bright),var(--gold-dark));
+  border-color:var(--gold-bright); box-shadow:0 0 8px rgba(240,180,41,0.45);
+}
+.unit-cb.checked::after { content:'✓'; font-size:10px; color:#fff; font-weight:700; }
+
+.unit-txt { flex:1; }
+.unit-name { font-family:var(--font-mono); font-size:10px; color:var(--purple-light); letter-spacing:1px; text-transform:uppercase; }
+.unit-topic { font-size:12px; font-weight:500; color:var(--text-2); margin-top:2px; font-family:var(--font-main); line-height:1.3; }
+.unit-item.done .unit-topic { text-decoration:line-through; color:var(--text-3); }
+.unit-item.done .unit-name  { color:var(--text-3); }
+
+/* Card bottom */
+.card-bottom { padding:8px 16px 14px; display:flex; justify-content:space-between; align-items:center; }
+.topic-count { font-family:var(--font-mono); font-size:10px; color:var(--text-3); }
+.expand-btn {
+  font-family:var(--font-mono); font-size:10px; color:var(--purple-light);
+  cursor:pointer; letter-spacing:1px;
+  border:1px solid rgba(168,85,247,0.3); padding:3px 10px;
+  border-radius:2px; transition:all 0.2s; background:none;
+}
+.expand-btn:hover { background:rgba(168,85,247,0.15); border-color:var(--purple-light); box-shadow:0 0 10px rgba(168,85,247,0.3); }
+
+/* ── STUDY RESOURCES ── */
+.resources-section {
+  margin: 50px 0 10px;
+  text-align: center;
+}
+.resources-inner {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 700px;
+}
+.resources-bg {
+  background: linear-gradient(135deg, rgba(28,0,58,0.9) 0%, rgba(60,10,100,0.85) 50%, rgba(28,0,58,0.9) 100%);
+  border: 1px solid var(--purple-border);
+  border-radius: 16px;
+  padding: 40px 32px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+}
+.resources-bg::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,0,255,0.18) 0%, transparent 70%);
+  animation: resPulse 3s ease-in-out infinite;
+}
+@keyframes resPulse {
+  0%,100%{opacity:0.6;} 50%{opacity:1;}
+}
+.resources-bg::after {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--purple-bright),var(--gold-bright),var(--purple-bright),transparent);
+  animation:topLineMove 3s linear infinite;
+  background-size: 200% 100%;
+}
+@keyframes topLineMove { 0%{background-position:0% 0%} 100%{background-position:200% 0%} }
+.resources-inner:hover .resources-bg {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 50px rgba(139,0,255,0.35), 0 0 100px rgba(240,180,41,0.15);
+  transform: scale(1.01);
+}
+.res-icon {
+  font-size: 42px; margin-bottom: 12px; position:relative; z-index:1;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+@keyframes floatIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+.res-title {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  background: linear-gradient(135deg, var(--gold-glow), var(--gold-bright), var(--purple-light));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom: 8px; position:relative; z-index:1;
+}
+.res-sub {
+  font-family: var(--font-main);
+  font-size: 14px; color: var(--text-2);
+  margin-bottom: 20px; position:relative; z-index:1;
+}
+.res-cta-btn {
+  display: inline-flex; align-items:center; gap:10px;
+  font-family: var(--font-display); font-size:14px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  background: linear-gradient(135deg, var(--purple-bright), var(--gold-dark));
+  color: #fff; padding:12px 32px; border-radius:8px;
+  border:none; cursor:pointer; position:relative; z-index:1;
+  box-shadow: 0 0 20px rgba(139,0,255,0.45), 0 0 40px rgba(240,180,41,0.2);
+  transition: all 0.3s; overflow:hidden;
+  animation: ctaGlow 2s ease-in-out infinite;
+}
+@keyframes ctaGlow {
+  0%,100%{box-shadow:0 0 20px rgba(139,0,255,0.45),0 0 40px rgba(240,180,41,0.2);}
+  50%{box-shadow:0 0 40px rgba(139,0,255,0.7),0 0 80px rgba(240,180,41,0.35);}
+}
+.res-cta-btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent 25%,rgba(255,255,255,0.2) 50%,transparent 75%);
+  transform:translateX(-100%); animation:sweepCta 2.5s ease-in-out infinite;
+}
+@keyframes sweepCta { 0%,100%{transform:translateX(-100%)} 50%{transform:translateX(100%)} }
+.resources-inner:hover .res-cta-btn {
+  transform:scale(1.05);
+  box-shadow:0 0 60px rgba(139,0,255,0.8),0 0 100px rgba(240,180,41,0.4);
+}
+.res-sparkles {
+  position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+}
+.sparkle {
+  position:absolute; width:3px; height:3px; border-radius:50%;
+  animation:sparkleFly linear infinite;
+}
+@keyframes sparkleFly {
+  0%   { transform:translate(var(--sx),var(--sy)) scale(0); opacity:0; }
+  20%  { opacity:1; transform:translate(var(--sx),var(--sy)) scale(1); }
+  80%  { opacity:1; }
+  100% { transform:translate(var(--ex),var(--ey)) scale(0); opacity:0; }
+}
+
+/* ── FOOTER ── */
+footer { text-align:center; padding:28px 20px; border-top:1px solid rgba(139,0,255,0.18); margin-top:60px; }
+.footer-txt { font-family:var(--font-mono); font-size:11px; color:var(--text-3); letter-spacing:2px; }
+.footer-txt span { color:var(--gold-bright); text-shadow:0 0 8px rgba(240,180,41,0.45); }
+
+/* Corner brackets */
+.corner { position:fixed; width:55px; height:55px; z-index:2; pointer-events:none; opacity:0.35; }
+.corner.tl{top:18px;left:18px;border-top:1px solid var(--gold-bright);border-left:1px solid var(--gold-bright);}
+.corner.tr{top:18px;right:18px;border-top:1px solid var(--gold-bright);border-right:1px solid var(--gold-bright);}
+.corner.bl{bottom:18px;left:18px;border-bottom:1px solid var(--purple-glow);border-left:1px solid var(--purple-glow);}
+.corner.br{bottom:18px;right:18px;border-bottom:1px solid var(--purple-glow);border-right:1px solid var(--purple-glow);}
+
+/* Toast */
+.toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:linear-gradient(135deg,rgba(28,0,58,0.97),rgba(17,0,32,0.97));
+  border:1px solid var(--gold-border); color:var(--gold-bright);
+  font-family:var(--font-mono); font-size:12px; letter-spacing:2px;
+  padding:10px 26px; border-radius:5px; z-index:9999;
+  box-shadow:0 0 28px rgba(139,0,255,0.4);
+  transition:transform 0.4s ease; white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Responsive */
+@media(max-width:600px){
+  .exams-grid{grid-template-columns:1fr;}
+  .stats-strip{grid-template-columns:repeat(3,1fr);}
+  #countdown-bar{padding:8px 14px;}
+  .cd-num{font-size:15px;}
+}
+</style>
+</head>
+<body>
+
+<!-- BG layers -->
+<div class="bg-layer"></div>
+<div class="grid-bg"></div>
+<div class="particles" id="particles"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ══ COUNTDOWN BAR ══ -->
+<div id="countdown-bar">
+  <div class="cd-left">
+    <div class="cd-label">⏳ NEXT EXAM</div>
+    <div class="cd-exam-name" id="cd-name">—</div>
+    <div class="cd-phase-badge" id="cd-phase-badge"></div>
+  </div>
+  <div class="cd-right">
+    <div class="cd-timer" id="cd-timer">
+      <div class="cd-unit"><div class="cd-num" id="cd-dd">00</div><div class="cd-seg">DAYS</div></div>
+      <div class="cd-colon">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cd-hh">00</div><div class="cd-seg">HRS</div></div>
+      <div class="cd-colon">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cd-mm">00</div><div class="cd-seg">MIN</div></div>
+      <div class="cd-colon">:</div>
+      <div class="cd-unit"><div class="cd-num" id="cd-ss">00</div><div class="cd-seg">SEC</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-chip">⚡ ALIET 2026 · CSE DS AR24 · AR24 REGULATION</div>
+    <h1 class="main-title">SMART EXAM PLANNER</h1>
+    <div class="subtitle">DEVELOPED BY CHANDRA MOHAN // ACADEMIC COMMAND CENTER</div>
+    <div class="mission-tag">MISSION : PLACEMENTS</div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-card"><div class="stat-num">11</div><div class="stat-lbl">Total Exams</div></div>
+    <div class="stat-card"><div class="stat-num">2</div><div class="stat-lbl">Mid Exams</div></div>
+    <div class="stat-card"><div class="stat-num">4</div><div class="stat-lbl">Lab Exams</div></div>
+    <div class="stat-card"><div class="stat-num">5</div><div class="stat-lbl">Sem Exams</div></div>
+    <div class="stat-card"><div class="stat-num">3</div><div class="stat-lbl">Phases</div></div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-bar">
+    <button class="btn btn-gold" onclick="expandAll()">⚡ EXPAND ALL SYLLABUS</button>
+    <button class="btn btn-purple" onclick="resetAll()">↺ RESET PROGRESS</button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-section">
+    <div class="prog-header">
+      <div class="prog-title">OVERALL STUDY PROGRESS</div>
+      <div class="prog-pct" id="overallPct">0%</div>
+    </div>
+    <div class="prog-bar-bg"><div class="prog-bar-fill" id="overallBar" style="width:0%"></div></div>
+    <div class="subj-prog-list" id="subjProgList"></div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-header">
+    <div class="ph-line"></div>
+    <div class="ph-label mid">⚡ PHASE 1 — MID 2 EXAMS</div>
+    <div class="ph-line"></div>
+  </div>
+  <div class="exams-grid" id="midGrid"></div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-header">
+    <div class="ph-line"></div>
+    <div class="ph-label lab">◈ PHASE 2 — EXTERNAL LAB EXAMS</div>
+    <div class="ph-line"></div>
+  </div>
+  <div class="exams-grid" id="labGrid"></div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-header">
+    <div class="ph-line"></div>
+    <div class="ph-label semester">◆ PHASE 3 — SEMESTER END EXAMS</div>
+    <div class="ph-line"></div>
+  </div>
+  <div class="exams-grid" id="semGrid"></div>
+
+  <!-- STUDY RESOURCES -->
+  <div class="resources-section">
+    <div class="phase-header" style="margin-top:0">
+      <div class="ph-line"></div>
+      <div class="ph-label semester">📚 STUDY RESOURCES</div>
+      <div class="ph-line"></div>
+    </div>
+    <div class="resources-inner" onclick="openStudyResources()">
+      <div class="resources-bg">
+        <div class="res-sparkles" id="resSparkles"></div>
+        <div class="res-icon">📚</div>
+        <div class="res-title">Study Materials</div>
+        <div class="res-sub">All notes, previous papers & reference materials in one place</div>
+        <button class="res-cta-btn">
+          <span>✨</span>
+          <span>Click Here to Access All Study Materials</span>
+          <span>🚀</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer>
+  <div class="footer-txt">SMART EXAM PLANNER · DEVELOPED BY <span>CHANDRA MOHAN</span> · ALIET 2026 · CSE DS AR24</div>
+  <div class="footer-txt" style="margin-top:6px;color:var(--purple-glow)">MISSION PLACEMENTS · EXECUTE WITH PRECISION</div>
+</footer>
+
+<script>
+// ══════════════════════════════════════════
+//  STUDY RESOURCES LINK — PASTE YOUR GOOGLE DRIVE LINK BELOW
+// ══════════════════════════════════════════
+const STUDY_RESOURCES_LINK = "https://drive.google.com/drive/folders/1cR2OipUpzhpSiwTcbG5UGF6XfwHW0mF5";
+// ══════════════════════════════════════════
+
+function openStudyResources() {
+  if (STUDY_RESOURCES_LINK === "PASTE_YOUR_GOOGLE_DRIVE_LINK_HERE") {
+    showToast("⚠ PLEASE ADD YOUR DRIVE LINK IN THE CODE");
+    return;
+  }
+  window.open(STUDY_RESOURCES_LINK, "_blank", "noopener,noreferrer");
+}
+
+// ── DATA ──
+const DATA = {
+  mid: [
+    {
+      id:"mid_dbms", subject:"DBMS", date:"2026-04-17", day:"Friday",
+      time:"09:00 AM – 10:50 AM", type:"mid",
+      syllabus:[
+        {unit:"Unit 3", topic:"SQL"},
+        {unit:"Unit 4", topic:"Schema Refinement (Normalization)"},
+        {unit:"Unit 5", topic:"Transaction Concepts & B Trees"}
+      ]
+    },
+    {
+      id:"mid_coa", subject:"COA", date:"2026-04-18", day:"Saturday",
+      time:"09:00 AM – 10:50 AM", type:"mid",
+      syllabus:[
+        {unit:"Unit 3", topic:"Computer Arithmetic"},
+        {unit:"Unit 4", topic:"Microprogrammed Control"},
+        {unit:"Unit 5", topic:"Memory Organization"}
+      ]
+    }
+  ],
+  lab: [
+    {
+      id:"lab_dbms", name:"DBMS LAB", date:"2026-04-20", day:"Monday",
+      time:"09:00 AM – 12:00 PM", icon:"🗄️", type:"lab",
+      syllabus:[
+        {unit:"Exp 1", topic:""},
+        {unit:"Exp 2", topic:""},
+        {unit:"Exp 3", topic:""},
+        {unit:"Exp 4", topic:""},
+        {unit:"Exp 5", topic:""},
+        {unit:"Exp 6", topic:""},
+        {unit:"Exp 7", topic:""},
+        {unit:"Exp 8", topic:""},
+        {unit:"Exp 9", topic:""},
+        {unit:"Exp 10", topic:""}
+      ]
+    },
+    {
+      id:"lab_eda", name:"EDA LAB", date:"2026-04-21", day:"Tuesday",
+      time:"09:00 AM – 12:00 PM", icon:"📊", type:"lab",
+      syllabus:[
+        {unit:"Unit 1", topic:""},
+        {unit:"Unit 2", topic:""},
+        {unit:"Unit 3", topic:""},
+        {unit:"Unit 4", topic:""},
+        {unit:"Unit 5", topic:""}
+      ]
+    },
+    {
+      id:"lab_dti", name:"DTI EXTERNAL LAB", date:"2026-04-22", day:"Wednesday",
+      time:"09:00 AM – 12:00 PM", icon:"🖥️", type:"lab",
+      syllabus:[
+        {unit:"Exp 1", topic:""},
+        {unit:"Exp 2", topic:""},
+        {unit:"Exp 3", topic:""},
+        {unit:"Exp 4", topic:""},
+        {unit:"Exp 5", topic:""}
+      ]
+    },
+    {
+      id:"lab_de", name:"DE LAB", date:"2026-04-23", day:"Thursday",
+      time:"09:00 AM – 12:00 PM", icon:"⚙️", type:"lab",
+      groups:[
+        { label:"EVEN SETS", items:[{unit:"Set 1",topic:""},{unit:"Set 2",topic:""},{unit:"Set 3",topic:""}] },
+        { label:"ODD SETS",  items:[{unit:"Set 1",topic:""},{unit:"Set 2",topic:""},{unit:"Set 3",topic:""}] }
+      ]
+    }
+  ],
+  sem: [
+    {
+      id:"sem_opt", subject:"Optimization Techniques", date:"2026-04-25", day:"Saturday",
+      time:"09:00 AM – 12:00 PM", type:"semester",
+      syllabus:[
+        {unit:"Unit 1", topic:"Introduction to Classical Optimization Techniques"},
+        {unit:"Unit 2", topic:"Linear Programming"},
+        {unit:"Unit 3", topic:"Transportation"},
+        {unit:"Unit 4", topic:"Non Linear Programming"},
+        {unit:"Unit 5", topic:"Dynamic Programming"}
+      ]
+    },
+    {
+      id:"sem_smds", subject:"Statistical Methods for Data Science", date:"2026-04-28", day:"Tuesday",
+      time:"09:00 AM – 12:00 PM", type:"semester",
+      syllabus:[
+        {unit:"Unit 1", topic:"Data Visualization & Data Distribution"},
+        {unit:"Unit 2", topic:"Hypothesis Testing"},
+        {unit:"Unit 3", topic:"Linear & Multiple Regression"},
+        {unit:"Unit 4", topic:"Time Series"},
+        {unit:"Unit 5", topic:"Logistic Regression"}
+      ]
+    },
+    {
+      id:"sem_de", subject:"Data Engineering", date:"2026-04-30", day:"Thursday",
+      time:"09:00 AM – 12:00 PM", type:"semester",
+      syllabus:[
+        {unit:"Unit 1", topic:"Introduction to Data Engineering"},
+        {unit:"Unit 2", topic:"Data Engineering Life Cycle"},
+        {unit:"Unit 3", topic:"Designing Good Data Architecture"},
+        {unit:"Unit 4", topic:"Storage"},
+        {unit:"Unit 5", topic:"Queries, Modeling & Transformation"}
+      ]
+    },
+    {
+      id:"sem_dbms", subject:"DBMS", date:"2026-05-02", day:"Saturday",
+      time:"09:00 AM – 12:00 PM", type:"semester",
+      syllabus:[
+        {unit:"Unit 1", topic:"Introduction to Database Systems"},
+        {unit:"Unit 2", topic:"Relational Model"},
+        {unit:"Unit 3", topic:"SQL"},
+        {unit:"Unit 4", topic:"Schema Refinement"},
+        {unit:"Unit 5", topic:"Transaction Concepts"}
+      ]
+    },
+    {
+      id:"sem_coa", subject:"COA", date:"2026-05-05", day:"Tuesday",
+      time:"09:00 AM – 12:00 PM", type:"semester",
+      syllabus:[
+        {unit:"Unit 1", topic:"Digital Computers & Data Representation"},
+        {unit:"Unit 2", topic:"Digital Logic Circuits"},
+        {unit:"Unit 3", topic:"Computer Arithmetic"},
+        {unit:"Unit 4", topic:"Microprogrammed Control"},
+        {unit:"Unit 5", topic:"Memory Organization"}
+      ]
+    }
+  ]
+};
+
+// ── STATE ──
+let ST = {};
+function loadST() { try { ST = JSON.parse(localStorage.getItem('sep_v3')||'{}'); } catch(e){ ST={}; } }
+function saveST() { localStorage.setItem('sep_v3', JSON.stringify(ST)); }
+
+// ── HELPERS ──
+function fmtDate(s) {
+  return new Date(s).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function examDateTime(dateStr, timeStr) {
+  // Parse exam end time from time string like "09:00 AM – 10:50 AM"
+  // Countdown to exam start
+  const parts = timeStr.split('–')[0].trim(); // "09:00 AM"
+  const d = new Date(dateStr);
+  const [time, period] = parts.split(' ');
+  let [h, m] = time.split(':').map(Number);
+  if (period === 'PM' && h !== 12) h += 12;
+  if (period === 'AM' && h === 12) h = 0;
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+function countdownStr(dateStr, timeStr) {
+  const target = examDateTime(dateStr, timeStr);
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) return { text:"COMPLETED", cls:"past" };
+  const days  = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins  = Math.floor((diff % 3600000) / 60000);
+  const secs  = Math.floor((diff % 60000) / 1000);
+  let text = '';
+  if (days > 0) text = `${days}D ${hours}H ${mins}M`;
+  else if (hours > 0) text = `${hours}H ${mins}M ${secs}S`;
+  else text = `${mins}M ${secs}S`;
+  const cls = days === 0 && hours < 12 ? 'urgent' : days <= 2 ? 'soon' : 'normal';
+  return { text, cls };
+}
+
+function isPast(dateStr, timeStr) {
+  return examDateTime(dateStr, timeStr) < new Date();
+}
+
+// ── GLOBAL COUNTDOWN BAR ──
+function getAllExams() {
+  return [
+    ...DATA.mid.map(e => ({...e, label: e.subject})),
+    ...DATA.lab.map(e => ({...e, subject: e.name, label: e.name})),
+    ...DATA.sem.map(e => ({...e, label: e.subject}))
+  ];
+}
+
+function updateCountdownBar() {
+  const now = new Date();
+  const upcoming = getAllExams()
+    .map(e => ({ ...e, dt: examDateTime(e.date, e.time) }))
+    .filter(e => e.dt > now)
+    .sort((a,b) => a.dt - b.dt);
+
+  if (!upcoming.length) {
+    document.getElementById('cd-name').textContent = "All Exams Completed! 🎉";
+    document.getElementById('cd-timer').innerHTML = '<div class="cd-all-done">WELL DONE!</div>';
+    document.getElementById('cd-phase-badge').textContent = '';
+    return;
+  }
+
+  const next = upcoming[0];
+  const diff = next.dt - now;
+  const dd = Math.floor(diff / 86400000);
+  const hh = Math.floor((diff % 86400000) / 3600000);
+  const mm = Math.floor((diff % 3600000) / 60000);
+  const ss = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-name').textContent = next.label;
+  document.getElementById('cd-dd').textContent = String(dd).padStart(2,'0');
+  document.getElementById('cd-hh').textContent = String(hh).padStart(2,'0');
+  document.getElementById('cd-mm').textContent = String(mm).padStart(2,'0');
+  document.getElementById('cd-ss').textContent = String(ss).padStart(2,'0');
+
+  const badge = document.getElementById('cd-phase-badge');
+  badge.textContent = next.type === 'mid' ? 'MID EXAM' : next.type === 'lab' ? 'LAB EXAM' : 'SEMESTER';
+  badge.className = 'cd-phase-badge ' + (next.type === 'mid' ? 'mid' : next.type === 'lab' ? 'lab' : 'semester');
+}
+
+// ── SYLLABUS ALL ITEMS for an exam ──
+function getAllItems(exam) {
+  if (exam.groups) {
+    return exam.groups.flatMap(g => g.items.map(it => `${g.label}__${it.unit}`));
+  }
+  return exam.syllabus.map(u => u.unit);
+}
+
+function getDoneCount(exam) {
+  return getAllItems(exam).filter(k => ST[`${exam.id}_${k}`]).length;
+}
+
+// ── RENDER EXAM CARD ──
+function renderCard(exam, isNext) {
+  const past = isPast(exam.date, exam.time);
+  const cd = countdownStr(exam.date, exam.time);
+  const items = getAllItems(exam);
+  const done = items.filter(k => ST[`${exam.id}_${k}`]).length;
+  const pct = items.length ? Math.round(done/items.length*100) : 0;
+  const name = exam.subject || exam.name;
+  const isLab = exam.type === 'lab';
+
+  let syllHtml = '';
+  if (exam.groups) {
+    syllHtml = exam.groups.map(g => `
+      <div class="lab-group-label">${g.label}</div>
+      ${g.items.map(it => {
+        const k = `${g.label}__${it.unit}`;
+        const chk = !!ST[`${exam.id}_${k}`];
+        return `<div class="unit-item${chk?' done':''}" onclick="toggleUnit('${exam.id}','${k}',this)">
+          <div class="unit-cb${chk?' checked':''}"></div>
+          <div class="unit-txt"><div class="unit-name">${it.unit}</div></div>
+        </div>`;
+      }).join('')}
+    `).join('');
+  } else {
+    syllHtml = exam.syllabus.map(u => {
+      const k = u.unit;
+      const chk = !!ST[`${exam.id}_${k}`];
+      return `<div class="unit-item${chk?' done':''}" onclick="toggleUnit('${exam.id}','${k}',this)">
+        <div class="unit-cb${chk?' checked':''}"></div>
+        <div class="unit-txt">
+          <div class="unit-name">${u.unit}</div>
+          ${u.topic ? `<div class="unit-topic">${u.topic}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  return `
+    <div class="exam-card${isLab?' lab-card':''}${past?' is-past':''}${isNext?' is-next':''}" id="card_${exam.id}">
+      <div class="next-badge">▶ NEXT EXAM</div>
+      <div class="done-stamp">✓ DONE</div>
+      <div class="card-top">
+        <div class="card-subject">${name}</div>
+        <div class="card-date-block">
+          <div class="card-date">${fmtDate(exam.date)}</div>
+          <div class="card-day">${exam.day.toUpperCase()}</div>
+          <div class="card-time">${exam.time}</div>
+        </div>
+      </div>
+      <div class="card-cd">
+        <span class="card-cd-icon">⏱</span>
+        <span class="card-cd-text ${cd.cls}">${cd.text}</span>
+      </div>
+      <div class="syll-section">
+        <div class="syll-toggle" onclick="toggleSyll('${exam.id}')">
+          <span class="syll-toggle-lbl">SYLLABUS CHECKLIST</span>
+          <span class="syll-pct" id="pct_${exam.id}">${pct}% done</span>
+        </div>
+        <div class="units-list" id="units_${exam.id}">${syllHtml}</div>
+      </div>
+      <div class="card-bottom">
+        <div class="topic-count">${done}/${items.length} ITEMS COVERED</div>
+        <button class="expand-btn" onclick="toggleSyll('${exam.id}')">VIEW LIST</button>
+      </div>
+    </div>`;
+}
+
+// ── TOGGLE UNIT ──
+function toggleUnit(examId, key, el) {
+  const stKey = `${examId}_${key}`;
+  ST[stKey] = !ST[stKey];
+  saveST();
+  el.querySelector('.unit-cb').classList.toggle('checked', ST[stKey]);
+  el.classList.toggle('done', ST[stKey]);
+  updateCardProgress(examId);
+  updateOverall();
+}
+
+function updateCardProgress(examId) {
+  const all = [...DATA.mid, ...DATA.lab, ...DATA.sem];
+  const exam = all.find(e => e.id === examId);
+  if (!exam) return;
+  const items = getAllItems(exam);
+  const done = items.filter(k => ST[`${examId}_${k}`]).length;
+  const pct = Math.round(done/items.length*100);
+  const el = document.getElementById(`pct_${examId}`);
+  if (el) el.textContent = `${pct}% done`;
+  const card = document.getElementById(`card_${examId}`);
+  if (card) {
+    const tc = card.querySelector('.topic-count');
+    if (tc) tc.textContent = `${done}/${items.length} ITEMS COVERED`;
+  }
+}
+
+// ── OVERALL PROGRESS ──
+function updateOverall() {
+  const all = [...DATA.mid, ...DATA.lab, ...DATA.sem];
+  let total = 0, done = 0;
+  const rows = [];
+  all.forEach(e => {
+    const items = getAllItems(e);
+    const d = items.filter(k => ST[`${e.id}_${k}`]).length;
+    total += items.length; done += d;
+    const name = (e.subject||e.name);
+    rows.push({ name: name.length > 16 ? name.slice(0,16)+'…' : name, d, t: items.length });
+  });
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('overallPct').textContent = pct+'%';
+  document.getElementById('overallBar').style.width = pct+'%';
+  document.getElementById('subjProgList').innerHTML = rows.map(r => {
+    const p = r.t ? Math.round(r.d/r.t*100) : 0;
+    return `<div class="subj-prog-item">
+      <div class="subj-prog-name">${r.name}</div>
+      <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${p}%"></div></div>
+      <div class="mini-pct">${p}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── TOGGLE SYLLABUS ──
+function toggleSyll(id) {
+  const el = document.getElementById(`units_${id}`);
+  if (el) el.classList.toggle('open');
+}
+
+// ── EXPAND ALL ──
+function expandAll() {
+  [...DATA.mid, ...DATA.lab, ...DATA.sem].forEach(e => {
+    const el = document.getElementById(`units_${e.id}`);
+    if (el) el.classList.add('open');
+  });
+  showToast('ALL UNITS EXPANDED');
+}
+
+// ── RESET ──
+function resetAll() {
+  if (!confirm('Reset all study progress? This cannot be undone.')) return;
+  ST = {}; saveST(); renderAll(); showToast('PROGRESS RESET');
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  const now = new Date();
+  const allE = [
+    ...DATA.mid.map(e=>({...e})),
+    ...DATA.lab.map(e=>({...e, subject:e.name})),
+    ...DATA.sem.map(e=>({...e}))
+  ];
+  const nextExam = allE
+    .map(e=>({...e, dt:examDateTime(e.date, e.time)}))
+    .filter(e=>e.dt>now)
+    .sort((a,b)=>a.dt-b.dt)[0];
+
+  const nextId = nextExam ? nextExam.id : null;
+
+  document.getElementById('midGrid').innerHTML = DATA.mid.map(e => renderCard(e, e.id===nextId)).join('');
+  document.getElementById('labGrid').innerHTML = DATA.lab.map(e => renderCard(e, e.id===nextId)).join('');
+  document.getElementById('semGrid').innerHTML = DATA.sem.map(e => renderCard(e, e.id===nextId)).join('');
+  updateOverall();
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+// ── PARTICLES ──
+function createParticles() {
+  const c = document.getElementById('particles');
+  const cols = ['#8b00ff','#f0b429','#c084fc','#ffe08a','#a855f7','#22d3ee'];
+  for (let i=0;i<38;i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const col = cols[Math.floor(Math.random()*cols.length)];
+    p.style.cssText = `left:${Math.random()*100}%;background:${col};box-shadow:0 0 5px ${col};animation-duration:${9+Math.random()*14}s;animation-delay:${-Math.random()*20}s;--drift:${(Math.random()-.5)*90}px`;
+    c.appendChild(p);
+  }
+}
+
+// ── RESOURCE SPARKLES ──
+function createSparkles() {
+  const c = document.getElementById('resSparkles');
+  const cols = ['#8b00ff','#f0b429','#c084fc','#22d3ee','#fff'];
+  for (let i=0;i<18;i++){
+    const s = document.createElement('div');
+    s.className='sparkle';
+    const col = cols[Math.floor(Math.random()*cols.length)];
+    const sx = (Math.random()*100)+'%', sy=(Math.random()*100)+'%';
+    const ex = ((Math.random()-.5)*60)+'px', ey=((Math.random()-.5)*60)+'px';
+    s.style.cssText=`left:${sx};top:${sy};background:${col};box-shadow:0 0 4px ${col};animation-duration:${2+Math.random()*3}s;animation-delay:${-Math.random()*4}s;--sx:0px;--sy:0px;--ex:${ex};--ey:${ey}`;
+    c.appendChild(s);
+  }
+}
+
+// ── INIT ──
+loadST();
+createParticles();
+createSparkles();
+renderAll();
+updateCountdownBar();
+setInterval(updateCountdownBar, 1000);
+// Re-render cards every minute to refresh "past" states
+setInterval(renderAll, 60000);
+</script>
+</body>
+</html>
