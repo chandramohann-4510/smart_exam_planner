@@ -538,6 +538,164 @@ header { text-align:center; padding:44px 20px 28px; }
   100% { transform:translate(var(--ex),var(--ey)) scale(0); opacity:0; }
 }
 
+/* ── LAB PRACTICE SECTION ── */
+.lab-practice-section {
+  margin: 40px 0 10px;
+  text-align: center;
+}
+.lab-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+  text-align: left;
+}
+.lab-card-item {
+  background: linear-gradient(135deg, rgba(0,30,58,0.9) 0%, rgba(0,50,80,0.85) 50%, rgba(0,30,58,0.9) 100%);
+  border: 1px solid rgba(34,211,238,0.3);
+  border-radius: 16px;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+.lab-card-item::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  opacity:0.7;
+}
+.lab-card-item::after {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(34,211,238,0.08) 0%, transparent 70%);
+  animation: labCardPulse 3s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes labCardPulse { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+.lab-card-item:hover {
+  transform: translateY(-5px);
+  border-color: rgba(34,211,238,0.65);
+  box-shadow: 0 14px 48px rgba(34,211,238,0.18), 0 0 28px rgba(34,211,238,0.1);
+}
+.lab-card-item.gold-variant {
+  background: linear-gradient(135deg, rgba(40,20,0,0.9) 0%, rgba(70,35,0,0.85) 50%, rgba(40,20,0,0.9) 100%);
+  border-color: rgba(240,180,41,0.3);
+}
+.lab-card-item.gold-variant::before {
+  background:linear-gradient(90deg,transparent,var(--gold-bright),transparent);
+}
+.lab-card-item.gold-variant::after {
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(240,180,41,0.08) 0%, transparent 70%);
+}
+.lab-card-item.gold-variant:hover {
+  border-color: rgba(240,180,41,0.65);
+  box-shadow: 0 14px 48px rgba(240,180,41,0.18), 0 0 28px rgba(240,180,41,0.1);
+}
+.lab-card-item.purple-variant {
+  background: linear-gradient(135deg, rgba(28,0,58,0.9) 0%, rgba(60,10,100,0.85) 50%, rgba(28,0,58,0.9) 100%);
+  border-color: var(--purple-border);
+}
+.lab-card-item.purple-variant::before {
+  background:linear-gradient(90deg,transparent,var(--purple-bright),var(--gold-bright),transparent);
+}
+.lab-card-item.purple-variant::after {
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,0,255,0.1) 0%, transparent 70%);
+}
+.lab-card-item.purple-variant:hover {
+  border-color: rgba(168,85,247,0.55);
+  box-shadow: 0 14px 48px rgba(139,0,255,0.22), 0 0 28px rgba(240,180,41,0.08);
+}
+.lab-card-icon {
+  font-size: 38px;
+  position: relative; z-index:1;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+.lab-card-title {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 800;
+  color: var(--cyan);
+  letter-spacing: 0.5px;
+  position: relative; z-index:1;
+}
+.lab-card-item.gold-variant .lab-card-title { color: var(--gold-bright); }
+.lab-card-item.purple-variant .lab-card-title {
+  background: linear-gradient(135deg, var(--gold-glow), var(--gold-bright), var(--purple-light));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.lab-card-sub {
+  font-family: var(--font-main);
+  font-size: 13px; color: var(--text-2);
+  position: relative; z-index:1;
+  line-height: 1.4;
+}
+.lab-cta-btn {
+  display: inline-flex; align-items:center; gap:8px;
+  font-family: var(--font-display); font-size:12px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  background: linear-gradient(135deg, rgba(0,120,160,0.9), rgba(34,211,238,0.25));
+  color: var(--cyan); padding:10px 22px; border-radius:8px;
+  border: 1px solid rgba(34,211,238,0.5); cursor:pointer;
+  position: relative; z-index:1;
+  box-shadow: 0 0 14px rgba(34,211,238,0.3);
+  transition: all 0.3s; margin-top:6px;
+}
+.lab-cta-btn:hover { box-shadow:0 0 28px rgba(34,211,238,0.6); transform:scale(1.04); }
+.lab-card-item.gold-variant .lab-cta-btn {
+  background: linear-gradient(135deg, rgba(100,50,0,0.9), rgba(240,180,41,0.25));
+  color: var(--gold-bright);
+  border-color: rgba(240,180,41,0.5);
+  box-shadow: 0 0 14px rgba(240,180,41,0.3);
+}
+.lab-card-item.gold-variant .lab-cta-btn:hover { box-shadow:0 0 28px rgba(240,180,41,0.6); }
+.lab-card-item.purple-variant .lab-cta-btn {
+  background: linear-gradient(135deg, var(--purple-bright), var(--gold-dark));
+  color: #fff;
+  border-color: var(--purple-glow);
+  box-shadow: 0 0 20px rgba(139,0,255,0.45), 0 0 40px rgba(240,180,41,0.2);
+  animation: ctaGlow 2s ease-in-out infinite;
+}
+.lab-card-item.purple-variant .lab-cta-btn:hover { box-shadow:0 0 40px rgba(139,0,255,0.8),0 0 60px rgba(240,180,41,0.4); }
+
+/* Sub-option buttons inside a card */
+.lab-sub-options {
+  display: flex; flex-direction: column; gap: 10px;
+  width: 100%; position: relative; z-index:1;
+}
+.lab-sub-btn {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 10px 16px; border-radius: 8px; border: none;
+  cursor: pointer; transition: all 0.3s; width: 100%; text-align:left;
+}
+.lab-sub-btn.cyan-btn {
+  background: rgba(34,211,238,0.1);
+  color: var(--cyan);
+  border: 1px solid rgba(34,211,238,0.35);
+}
+.lab-sub-btn.cyan-btn:hover { background: rgba(34,211,238,0.2); box-shadow:0 0 16px rgba(34,211,238,0.35); }
+.lab-sub-btn.gold-btn {
+  background: rgba(240,180,41,0.1);
+  color: var(--gold-bright);
+  border: 1px solid rgba(240,180,41,0.35);
+}
+.lab-sub-btn.gold-btn:hover { background: rgba(240,180,41,0.2); box-shadow:0 0 16px rgba(240,180,41,0.35); }
+.lab-sub-btn.purple-btn {
+  background: rgba(139,0,255,0.12);
+  color: var(--purple-light);
+  border: 1px solid var(--purple-border);
+}
+.lab-sub-btn.purple-btn:hover { background: rgba(139,0,255,0.22); box-shadow:0 0 16px rgba(139,0,255,0.35); }
+.lab-sub-btn .btn-icon { font-size: 18px; flex-shrink:0; }
+.lab-sub-btn .btn-text { display:flex; flex-direction:column; gap:2px; }
+.lab-sub-btn .btn-label { font-size:12px; font-weight:700; }
+.lab-sub-btn .btn-desc { font-size:10px; font-weight:400; color: var(--text-3); letter-spacing:0.5px; text-transform:none; font-family:var(--font-main); }
+
 /* ── FOOTER ── */
 footer { text-align:center; padding:28px 20px; border-top:1px solid rgba(139,0,255,0.18); margin-top:60px; }
 .footer-txt { font-family:var(--font-mono); font-size:11px; color:var(--text-3); letter-spacing:2px; }
@@ -676,17 +834,16 @@ body { padding-bottom:34px; }
 
 <!-- ══ TOP NOTIFICATION TICKER ══ -->
 <div class="notif-ticker top">
-  <div class="notif-label"><div class="notif-dot"></div>🔔 NOTICE</div>
+  <div class="notif-label"><div class="notif-dot"></div>🎓 MESSAGE</div>
   <div class="notif-track-wrap">
     <div class="notif-track">
-      <!-- duplicate items for seamless loop -->
-      <span class="notif-item"><span class="ni-badge">NEW</span>DMGT &amp; JAVA notes are available for supplementary exams — check Study Resources now!</span>
+      <span class="notif-item"><span class="ni-badge">🌟 BEST OF LUCK</span>Best of Luck for your Exams — Hope this Smart Exam Planner helps you in your exam preparation! 📚✨</span>
       <span class="notif-sep">✦</span>
-      <span class="notif-item"><span class="ni-badge">INFO</span>All supplementary exam study materials have been uploaded to the Google Drive folder.</span>
+      <span class="notif-item"><span class="ni-badge">💪 YOU GOT THIS</span>Best of Luck for your Exams — Hope this Smart Exam Planner helps you in your exam preparation! 🚀🎯</span>
       <span class="notif-sep">✦</span>
-      <span class="notif-item"><span class="ni-badge">NEW</span>DMGT &amp; JAVA notes are available for supplementary exams — check Study Resources now!</span>
+      <span class="notif-item"><span class="ni-badge">🌟 BEST OF LUCK</span>Best of Luck for your Exams — Hope this Smart Exam Planner helps you in your exam preparation! 📚✨</span>
       <span class="notif-sep">✦</span>
-      <span class="notif-item"><span class="ni-badge">INFO</span>All supplementary exam study materials have been uploaded to the Google Drive folder.</span>
+      <span class="notif-item"><span class="ni-badge">💪 YOU GOT THIS</span>Best of Luck for your Exams — Hope this Smart Exam Planner helps you in your exam preparation! 🚀🎯</span>
       <span class="notif-sep">✦</span>
     </div>
   </div>
@@ -773,6 +930,110 @@ body { padding-bottom:34px; }
     </div>
   </div>
 
+  <!-- ══ LAB PRACTICE PITCH ══ -->
+  <div class="lab-practice-section">
+    <div class="phase-header" style="margin-top:0">
+      <div class="ph-line"></div>
+      <div class="ph-label lab">🧪 LAB PRACTICE PITCH</div>
+      <div class="ph-line"></div>
+    </div>
+
+    <div class="lab-cards-grid">
+
+      <!-- PLSQL PRACTICE -->
+      <div class="lab-card-item" onclick="safeOpen('https://onecompiler.com/plsql')">
+        <div class="lab-card-icon">🗄️</div>
+        <div class="lab-card-title">PL/SQL Practice</div>
+        <div class="lab-card-sub">Run and practice PL/SQL programs online — procedures, triggers, cursors &amp; more</div>
+        <button class="lab-cta-btn">
+          <span>▶</span>
+          <span>Open PL/SQL Compiler</span>
+        </button>
+      </div>
+
+      <!-- GENERAL SQL PRACTICE -->
+      <div class="lab-card-item gold-variant" onclick="safeOpen('https://www.programiz.com/sql/online-compiler')">
+        <div class="lab-card-icon">📋</div>
+        <div class="lab-card-title">General SQL Practice</div>
+        <div class="lab-card-sub">Write and execute SQL queries online — SELECT, JOIN, subqueries &amp; DDL/DML practice</div>
+        <button class="lab-cta-btn">
+          <span>▶</span>
+          <span>Open SQL Compiler</span>
+        </button>
+      </div>
+
+      <!-- EDA PRACTICE -->
+      <div class="lab-card-item purple-variant">
+        <div class="lab-card-icon">📊</div>
+        <div class="lab-card-title">EDA Practice</div>
+        <div class="lab-card-sub">Choose your preferred environment for Exploratory Data Analysis</div>
+        <div class="lab-sub-options">
+          <button class="lab-sub-btn cyan-btn" onclick="event.stopPropagation(); safeOpen('https://colab.research.google.com/')">
+            <span class="btn-icon">🤝</span>
+            <span class="btn-text">
+              <span class="btn-label">Google Colab</span>
+              <span class="btn-desc">Cloud-based Python notebook — no install needed</span>
+            </span>
+          </button>
+          <button class="lab-sub-btn gold-btn" onclick="event.stopPropagation(); safeOpen('https://www.programiz.com/python-programming/online-compiler/')">
+            <span class="btn-icon">🐍</span>
+            <span class="btn-text">
+              <span class="btn-label">Python Online Compiler</span>
+              <span class="btn-desc">Quick Python execution in your browser</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ DATASETS & CASE STUDIES ══ -->
+  <div class="lab-practice-section" style="margin-top:40px;">
+    <div class="phase-header" style="margin-top:0">
+      <div class="ph-line"></div>
+      <div class="ph-label mid">📂 DATASETS &amp; CASE STUDIES</div>
+      <div class="ph-line"></div>
+    </div>
+
+    <div class="lab-cards-grid">
+
+      <!-- EDA LAB DATASETS -->
+      <div class="lab-card-item gold-variant" onclick="safeOpen('https://www.kaggle.com/code/nishantrajadhyaksha/cars4u-dataset')">
+        <div class="lab-card-icon">🚗</div>
+        <div class="lab-card-title">EDA Lab Datasets</div>
+        <div class="lab-card-sub">Cars4U Dataset — for <strong style="color:var(--gold-bright)">Exp 3 &amp; Exp 4</strong> of EDA Lab</div>
+        <button class="lab-cta-btn">
+          <span>📥</span>
+          <span>Get Dataset (Exp 3 &amp; 4)</span>
+        </button>
+      </div>
+
+      <!-- UNIT 5 CASE STUDY -->
+      <div class="lab-card-item" onclick="safeOpen('https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv')">
+        <div class="lab-card-icon">🍷</div>
+        <div class="lab-card-title">Unit 5 Case Study</div>
+        <div class="lab-card-sub">Wine Quality Dataset — Red Wine CSV for <strong style="color:var(--cyan)">Unit 5 Case Study</strong></div>
+        <button class="lab-cta-btn">
+          <span>📥</span>
+          <span>Download Wine Dataset</span>
+        </button>
+      </div>
+
+      <!-- IRIS DATASET -->
+      <div class="lab-card-item purple-variant" onclick="safeOpen('https://share.google/seb7aSEfzGke4diMM')">
+        <div class="lab-card-icon">🌸</div>
+        <div class="lab-card-title">Iris Dataset</div>
+        <div class="lab-card-sub">Classic Iris Dataset — for <strong style="color:var(--purple-light)">Unit 2 Exp 2</strong> &amp; <strong style="color:var(--gold-bright)">Unit 4 Exp 2</strong></div>
+        <button class="lab-cta-btn">
+          <span>📥</span>
+          <span>Access Iris Dataset</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- /wrapper -->
 
 <footer>
@@ -782,16 +1043,16 @@ body { padding-bottom:34px; }
 
 <!-- ══ BOTTOM NOTIFICATION TICKER ══ -->
 <div class="notif-ticker bottom">
-  <div class="notif-label"><div class="notif-dot"></div>📢 UPDATE</div>
+  <div class="notif-label"><div class="notif-dot"></div>🎯 PLANNER</div>
   <div class="notif-track-wrap">
     <div class="notif-track">
-      <span class="notif-item"><span class="ni-badge">HOT</span>DMGT &amp; JAVA notes are available for supplementary exams — access via Study Resources!</span>
+      <span class="notif-item"><span class="ni-badge">🌟 BEST OF LUCK</span>Hope this Smart Exam Planner helps you ace your exams — Stay focused, stay sharp! 💡</span>
       <span class="notif-sep">◆</span>
-      <span class="notif-item"><span class="ni-badge">ALERT</span>Supplementary exam notes uploaded — DMGT &amp; JAVA now available. Don't miss out!</span>
+      <span class="notif-item"><span class="ni-badge">🎓 ALIET 2026</span>Best of Luck for your Exams — Use the Lab Practice &amp; Study Resources sections to prepare well! 🚀</span>
       <span class="notif-sep">◆</span>
-      <span class="notif-item"><span class="ni-badge">HOT</span>DMGT &amp; JAVA notes are available for supplementary exams — access via Study Resources!</span>
+      <span class="notif-item"><span class="ni-badge">🌟 BEST OF LUCK</span>Hope this Smart Exam Planner helps you ace your exams — Stay focused, stay sharp! 💡</span>
       <span class="notif-sep">◆</span>
-      <span class="notif-item"><span class="ni-badge">ALERT</span>Supplementary exam notes uploaded — DMGT &amp; JAVA now available. Don't miss out!</span>
+      <span class="notif-item"><span class="ni-badge">🎓 ALIET 2026</span>Best of Luck for your Exams — Use the Lab Practice &amp; Study Resources sections to prepare well! 🚀</span>
       <span class="notif-sep">◆</span>
     </div>
   </div>
@@ -804,12 +1065,31 @@ body { padding-bottom:34px; }
 const STUDY_RESOURCES_LINK = "https://drive.google.com/drive/folders/1cR2OipUpzhpSiwTcbG5UGF6XfwHW0mF5";
 // ══════════════════════════════════════════
 
+// ── SAFE OPEN: secure redirect, no raw URLs visible in HTML ──
+const ALLOWED_ORIGINS = [
+  "onecompiler.com",
+  "programiz.com",
+  "colab.research.google.com",
+  "www.kaggle.com",
+  "archive.ics.uci.edu",
+  "share.google",
+  "drive.google.com"
+];
+function safeOpen(url) {
+  try {
+    const parsed = new URL(url);
+    const allowed = ALLOWED_ORIGINS.some(o => parsed.hostname === o || parsed.hostname.endsWith('.' + o));
+    if (!allowed) { showToast("⚠ BLOCKED: UNTRUSTED URL"); return; }
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch(e) { showToast("⚠ INVALID URL"); }
+}
+
 function openStudyResources() {
   if (STUDY_RESOURCES_LINK === "PASTE_YOUR_GOOGLE_DRIVE_LINK_HERE") {
     showToast("⚠ PLEASE ADD YOUR DRIVE LINK IN THE CODE");
     return;
   }
-  window.open(STUDY_RESOURCES_LINK, "_blank", "noopener,noreferrer");
+  safeOpen(STUDY_RESOURCES_LINK);
 }
 
 // ── DATA ──
